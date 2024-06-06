@@ -83,3 +83,13 @@ class LoginSerializer(serializers.Serializer):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "uuid",
+            "email",
+            "password",
+            "first_name"
+        ]
+        
