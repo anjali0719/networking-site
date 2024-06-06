@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import viewsets, permissions, status
-from .models import User
-from .serializers import SignUpSerializer, LoginSerializer, UserSerializer
+from .models import User, FriendRequest
+from .serializers import SignUpSerializer, LoginSerializer, UserSerializer, FriendRequestSerializer
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
@@ -49,4 +49,10 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         data = super(UserViewSet, self).get_serializer_context()
         return data
+    
+class FriendRequestViewSet(viewsets.ModelViewSet):
+    queryset = FriendRequest.objects.all() 
+    serializer_class = FriendRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'uuid'
     

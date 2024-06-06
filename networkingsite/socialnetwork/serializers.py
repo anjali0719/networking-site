@@ -1,7 +1,10 @@
 from rest_framework import serializers, status
 from rest_framework.response import Response
-from .models import User
+from .models import User, FriendRequest
+from .constants import RequestStatusTypeChoices
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils import timezone
+from datetime import datetime, timedelta
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -93,3 +96,51 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name"
         ]
         
+
+class FriendRequestSerializer(serializers.ModelSerializer):
+    to_user_uuid = serializers.UUIDField(source='to_user.uuid', default=None, write_only=True)
+    from_user_uuid = serializers.UUIDField(source='from_user.uuid', required=False, write_only=True)
+    class Meta:
+        model = FriendRequest
+        fields = [
+            "uuid",
+            "from_user",
+            "from_user_uuid",
+            "to_user",
+            "to_user_uuid",
+            "status"
+        ]
+        read_only_fields = ['from_user', 'to_user']
+        
+    def create(self, validated_data):
+        try:
+            to_user_uuid = validated_data.pop('to_user')['uuid']
+            to_user = User.objects.filter(uuid=to_user_uuid).first()
+            from_user = self.context.get('request').user
+            time_limit = timezone.now() - timedelta(minutes=3)
+            friend_request = None
+            
+            if from_user and to_user:
+                if FriendRequest.objects.filter(to_user=to_user, from_user=from_user, created_at__gte=time_limit).count() > 3:
+                    raise serializers.ValidationError("You cannot send more than 3 friend request within a minute")
+
+                elif FriendRequest.objects.filter(to_user=to_user, from_user=from_user).exists():
+                    raise serializers.ValidationError("You already have a friend request from this user")
+
+                else:
+                    friend_request = FriendRequest.objects.create(status=RequestStatusTypeChoices.PENDING, **validated_data)
+            else:
+                raise serializers.ValidationError("User to send request not provided") 
+            
+            return friend_request
+            
+        except Exception as error:
+            print(f"Something went wrong while sending the friend request: {error}")
+            return Response(
+                {
+                    'message': "Something went wrong while sending the friend request",
+                    'error': error
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            

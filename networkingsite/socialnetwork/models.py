@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from common.models import BaseModel
+from .constants import RequestStatusTypeChoices
 
 # Create your models here.
 class User(AbstractBaseUser, BaseModel):
@@ -11,3 +12,26 @@ class User(AbstractBaseUser, BaseModel):
     
     def __str__(self):
         return str(self.uuid)
+
+
+    
+class FriendRequest(BaseModel):
+    from_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='sent_request'
+    )
+    to_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='received_request'
+    )
+    status = models.CharField(
+        choices=RequestStatusTypeChoices.choices,
+        max_length=20,
+        null=True
+    )
+
+    def __str__(self):
+        return str(self.uuid)
+    
