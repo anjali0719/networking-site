@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
+from rest_framework.authtoken.models import Token
 from common.models import BaseModel
 from .constants import RequestStatusTypeChoices
 

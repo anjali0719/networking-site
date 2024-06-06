@@ -3,10 +3,11 @@ from rest_framework.views import APIView
 from rest_framework import viewsets, permissions, status
 from .models import User, FriendRequest
 from .serializers import SignUpSerializer, LoginSerializer, UserSerializer, FriendRequestSerializer
+from .constants import RequestStatusTypeChoices
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
-
+from rest_framework.decorators import action
 
 # Create your views here.
 
@@ -49,10 +50,38 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         data = super(UserViewSet, self).get_serializer_context()
         return data
+
     
 class FriendRequestViewSet(viewsets.ModelViewSet):
     queryset = FriendRequest.objects.all() 
     serializer_class = FriendRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'uuid'
+    
+    
+    """
+        use this API to GET the list of Pending / Received Friend Requests of the current user
+    """
+    def get_queryset(self):
+        logged_in_user = self.context.get('request').user
+        queryset = FriendRequest.objects.filter(from_user=logged_in_user, status=RequestStatusTypeChoices.PENDING)
+        return Response(queryset)
+    
+    
+    """
+        use this API to GET the Friend's list(Accepted Requests) of the current user
+    """
+    @action(
+        detail=False,
+        url_path='friends-list',
+        methods=['GET'],
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    
+    def get_friends_list(self, request):
+        logged_in_user = request.auth.user
+        queryset = FriendRequest.objects.filter(from_user=logged_in_user, status=RequestStatusTypeChoices.ACCEPTED)
+        
+        serialized_data = FriendRequestSerializer(queryset)
+        return Response(serialized_data.data)
     

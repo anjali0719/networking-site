@@ -21,8 +21,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         try:
             first_name = validated_data.get("email")
             first_name = first_name.split('@')[0]
-            username = validated_data.get("email")
-            instance = User.objects.create(first_name=first_name, username=username, **validated_data)
+            instance = User.objects.create(first_name=first_name, **validated_data)
             return instance
         
         except Exception as error:
@@ -144,3 +143,14 @@ class FriendRequestSerializer(serializers.ModelSerializer):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
+    """
+        Accepting/Rejecting a friend request basically means we're updating the FriendRequest Object
+        Hence, we're using the PATCH method where only status will be sent in the payload and accordingly we'll update the status of FriendRequest
+    """
+    def update(self, instance, validated_data):
+        status = validated_data.get(status)
+        if instance:
+            instance.status = status
+            instance.save()
+            
+        return FriendRequestSerializer(instance).data
