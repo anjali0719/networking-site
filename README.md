@@ -1,6 +1,9 @@
-# Social Networking
+<div align="center">
+   <h1>Social Networking</h1>
+   <img src="https://github.com/anjali0719/networking-site/assets/169834149/4ff0bd38-f58d-4261-a4e1-b4ba08906f09">
+</div>
 
-Social Networking a place where you can make friends. It also covers some other features.
+A place where you can make friends. It also covers some other features.
 
 ## Usage
 1. Anyone can register using their email and password
@@ -14,3 +17,7 @@ Social Networking a place where you can make friends. It also covers some other 
 > [!NOTE]
 > In a minute you can send upto 3 friend requests only!
 
+## Installation Steps
+```sh
+pip install djangorestframework
+```
