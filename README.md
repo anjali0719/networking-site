@@ -53,4 +53,4 @@ pip install django-filter
 ```
 
 > [!NOTE]
-> You can use ``` pip freeze > requirements.txt ``` to install the req pkgs mentioned in the requirements file
+> You can use ``` pip freeze -r requirements.txt ``` to install the req pkgs mentioned in the requirements file
