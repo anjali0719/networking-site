@@ -174,7 +174,11 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         status = validated_data.get('status', instance.status)
         if instance:
-            instance.status = status
+            if instance.status == RequestStatusTypeChoices.ACCEPTED:
+                raise serializers.ValidationError("This request is already accepted, you cannot perform any operation on it")
+            else:
+                instance.status = status
+            
             instance.save()
             
         return instance

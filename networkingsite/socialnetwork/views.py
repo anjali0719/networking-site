@@ -63,7 +63,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         logged_in_user = self.request.user
-        queryset = FriendRequest.objects.filter(from_user=logged_in_user).order_by('-created_at')
+        queryset = FriendRequest.objects.filter(to_user=logged_in_user).order_by('-created_at')
         return queryset
     
     def get_serializer_context(self):
