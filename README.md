@@ -97,20 +97,22 @@ python manage.py createsuperuser
    * API Endpoint: http://127.0.0.1:8000/friend-request/
    * Method: POST
    * Authentication: Bearer Token (paste the access token received from login api response)
-   * Body: (uuid of the user to whom you want to send request)
+   * Body:
         {
           "to_user_uuid": "6b12bca5-416a-3399-b689-8f5d995251b7"
         }
+     (uuid of the user to whom you want to send request)
      
 6. Accept or Reject Friend Request:
    * API Endpoint: http://127.0.0.1:8000/friend-request/72b4dcdd-7d63-35f7-ac99-70e0e098fbb6/
      (send the UUID of the Friend Request Obj which you want to update)
    * Method: PUT
    * Authentication: Bearer Token (paste the access token received from login api response)
-   * Body: (send the status as `accepted` or `rejected`)
+   * Body:
         {
           "status": "accepted"
         }
+     (send the status as `accepted` or `rejected`)
      
 7. Get the Friend List of logged in user:
    * API Endpoint: http://127.0.0.1:8000/friend-request/friends-list/?limit=15&offset=0
