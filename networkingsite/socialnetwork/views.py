@@ -40,7 +40,7 @@ class UserViewSet(viewsets.ModelViewSet):
         search = self.request.query_params.get('search', None)
         
         if search and search != '':
-            queryset = User.objects.filter(Q(email__iexact=search) | Q(first_name__icontains=search))
+            queryset = User.objects.filter(Q(email__iexact=search) | Q(first_name__icontains=search)).order_by('-created_at')
             # q_filt = Q()
             # q_filt |= Q(email__iexact=search)
             # q_filt |= Q(first_name__icontains=search)
