@@ -17,6 +17,10 @@ A place where you can make friends. It also covers some other features.
 > [!NOTE]
 > In a minute you can send upto 3 friend requests only!
 
+## Requirements
+ * Python: 3.12
+ * Django: 5.0
+
 ## Installation Steps
 ```sh
 pip install djangorestframework
