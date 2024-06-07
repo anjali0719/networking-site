@@ -12,7 +12,7 @@ from rest_framework.decorators import action
 # Create your views here.
 
 class SignUpViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_active=True)
     # sign-up is an open API, it isn't having any authentication 
     permission_classes = [permissions.AllowAny]
     serializer_class = SignUpSerializer
@@ -29,21 +29,22 @@ class LoginViewSet(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'uuid'
     filter_backends = [DjangoFilterBackend]
     
     def get_queryset(self):
-        queryset = User.objects.all().order_by('-created_at')
+        queryset = User.objects.filter(is_active=True).order_by('-created_at')
         search = self.request.query_params.get('search', None)
         
         if search and search != '':
-            q_filt = Q()
-            q_filt |= Q(email__iexact=search)
-            q_filt |= Q(first_name__icontains=search)
-            queryset = queryset.filter(q_filt)
+            queryset = User.objects.filter(Q(email__iexact=search) | Q(first_name__icontains=search))
+            # q_filt = Q()
+            # q_filt |= Q(email__iexact=search)
+            # q_filt |= Q(first_name__icontains=search)
+            # queryset = queryset.filter(q_filt)
            
         return queryset
         
@@ -59,13 +60,25 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     lookup_field = 'uuid'
     
     
+    def get_queryset(self):
+        return self.queryset
+    
+    
     """
         use this API to GET the list of Pending / Received Friend Requests of the current user
     """
-    def get_queryset(self):
-        logged_in_user = self.context.get('request').user
+    @action(
+        detail=False,
+        url_path='received-list',
+        methods=['GET'],
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def get_received_list(slef, request):
+        logged_in_user = request.user
         queryset = FriendRequest.objects.filter(from_user=logged_in_user, status=RequestStatusTypeChoices.PENDING)
-        return Response(queryset)
+        
+        results = FriendRequestSerializer(queryset, many=True)
+        return Response(results.data)
     
     
     """
@@ -79,9 +92,9 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     )
     
     def get_friends_list(self, request):
-        logged_in_user = request.auth.user
+        logged_in_user = request.user
         queryset = FriendRequest.objects.filter(from_user=logged_in_user, status=RequestStatusTypeChoices.ACCEPTED)
         
-        serialized_data = FriendRequestSerializer(queryset)
-        return Response(serialized_data.data)
-    
+        results = FriendRequestSerializer(queryset, many=True)
+        return Response(results.data)
+

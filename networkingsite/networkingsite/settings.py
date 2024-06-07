@@ -55,6 +55,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 ROOT_URLCONF = 'networkingsite.urls'
 
 TEMPLATES = [
@@ -142,7 +147,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# AUTH_USER_MODEL = 'socialnetwork.User'
+AUTH_USER_MODEL = 'socialnetwork.User'
 
 DJOSER = {
     "LOGIN_FIELD" : "email"

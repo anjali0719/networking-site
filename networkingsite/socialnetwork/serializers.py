@@ -99,6 +99,9 @@ class UserSerializer(serializers.ModelSerializer):
 class FriendRequestSerializer(serializers.ModelSerializer):
     to_user_uuid = serializers.UUIDField(source='to_user.uuid', default=None, write_only=True)
     from_user_uuid = serializers.UUIDField(source='from_user.uuid', required=False, write_only=True)
+    from_user = serializers.SerializerMethodField()
+    to_user = serializers.SerializerMethodField()
+    
     class Meta:
         model = FriendRequest
         fields = [
@@ -110,6 +113,24 @@ class FriendRequestSerializer(serializers.ModelSerializer):
             "status"
         ]
         read_only_fields = ['from_user', 'to_user']
+    
+    def get_from_user(self, obj):
+        from_user = ""
+        try:
+            if obj and obj.from_user:
+                from_user = obj.from_user.email
+        except Exception as e:
+            print(f"Error while getting From User: {e}")
+        return from_user
+    
+    def get_to_user(self, obj):
+        to_user = ""
+        try:
+            if obj and obj.to_user:
+                to_user = obj.to_user.email
+        except Exception as e:
+            print(f"Error while getting From User: {e}")
+        return to_user
         
     def create(self, validated_data):
         try:
@@ -120,6 +141,9 @@ class FriendRequestSerializer(serializers.ModelSerializer):
             friend_request = None
             
             if from_user and to_user:
+                validated_data['from_user'] = from_user
+                validated_data['to_user'] = to_user
+                
                 if FriendRequest.objects.filter(to_user=to_user, from_user=from_user, created_at__gte=time_limit).count() > 3:
                     raise serializers.ValidationError("You cannot send more than 3 friend request within a minute")
 
@@ -148,9 +172,9 @@ class FriendRequestSerializer(serializers.ModelSerializer):
         Hence, we're using the PATCH method where only status will be sent in the payload and accordingly we'll update the status of FriendRequest
     """
     def update(self, instance, validated_data):
-        status = validated_data.get(status)
+        status = validated_data.get('status', instance.status)
         if instance:
             instance.status = status
             instance.save()
             
-        return FriendRequestSerializer(instance).data
+        return instance
