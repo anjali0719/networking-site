@@ -57,12 +57,18 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     queryset = FriendRequest.objects.all() 
     serializer_class = FriendRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
     lookup_field = 'uuid'
     
     
     def get_queryset(self):
-        return self.queryset
+        logged_in_user = self.request.user
+        queryset = FriendRequest.objects.filter(from_user=logged_in_user).order_by('-created_at')
+        return queryset
     
+    def get_serializer_context(self):
+        data = super(FriendRequestViewSet, self).get_serializer_context()
+        return data
     
     """
         use this API to GET the list of Pending / Received Friend Requests of the current user
