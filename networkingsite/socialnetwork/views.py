@@ -12,7 +12,7 @@ from rest_framework.decorators import action
 # Create your views here.
 
 class SignUpViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.filter(is_active=True)
+    queryset = User.objects.filter(is_active=True).order_by('-created_at')
     # sign-up is an open API, it isn't having any authentication 
     permission_classes = [permissions.AllowAny]
     serializer_class = SignUpSerializer
@@ -54,7 +54,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     
 class FriendRequestViewSet(viewsets.ModelViewSet):
-    queryset = FriendRequest.objects.all() 
+    queryset = FriendRequest.objects.all().order_by('-created_at')
     serializer_class = FriendRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
@@ -62,9 +62,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     
     
     def get_queryset(self):
-        logged_in_user = self.request.user
-        queryset = FriendRequest.objects.filter(to_user=logged_in_user).order_by('-created_at')
-        return queryset
+        return self.queryset
     
     def get_serializer_context(self):
         data = super(FriendRequestViewSet, self).get_serializer_context()
@@ -81,7 +79,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     )
     def get_received_list(slef, request):
         logged_in_user = request.user
-        queryset = FriendRequest.objects.filter(from_user=logged_in_user, status=RequestStatusTypeChoices.PENDING)
+        queryset = FriendRequest.objects.filter(to_user=logged_in_user, status=RequestStatusTypeChoices.PENDING)
         
         results = FriendRequestSerializer(queryset, many=True)
         return Response(results.data)
@@ -99,7 +97,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     
     def get_friends_list(self, request):
         logged_in_user = request.user
-        queryset = FriendRequest.objects.filter(from_user=logged_in_user, status=RequestStatusTypeChoices.ACCEPTED)
+        queryset = FriendRequest.objects.filter(to_user=logged_in_user, status=RequestStatusTypeChoices.ACCEPTED)
         
         results = FriendRequestSerializer(queryset, many=True)
         return Response(results.data)
