@@ -124,3 +124,7 @@ python manage.py createsuperuser
    * Method: GET
    * Authentication: Bearer Token (paste the access token received from login api response)
 
+## Refer To 🎥
+
+https://github.com/anjali0719/networking-site/assets/169834149/0c0f90aa-16cd-4197-a072-f6c23b9a597f
+
