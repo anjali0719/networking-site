@@ -51,12 +51,16 @@ pip install djangorestframework-simplejwt
 ```sh
 pip install django-filter
 ```
-7. Generate necessary migration files
+7. Install Djoser
+```sh
+pip install djoser
+```
+8. Generate necessary migration files
 ```sh
 python manage.py makemigrations
 python manage.py migrate
 ```
-8. Create superuser to access django admin panel ``` http://localhost:8000/admin/ ``` or ``` http://127.0.0.1:8000/admin/ ```
+9. Create superuser to access django admin panel ``` http://localhost:8000/admin/ ``` or ``` http://127.0.0.1:8000/admin/ ```
 ```sh
 python manage.py createsuperuser
 ```
