@@ -34,9 +34,16 @@ pip install pip
 ```sh
 pip install pipenv
 ```
-3. Activate Virtual Env (Incase if you don't have, it'll create one for you)
+3. Create & Activate Virtual Env
 ```sh
-pipenv shell
+python -m venv env_name
+
+**(activating venv, when using Linux)**
+source env_name/bin/activate
+
+**(activating venv, when using Windows)**
+cd env_name
+Scripts\activate
 ```
 4. Install Django & DjangoRestFramework
 ```sh
